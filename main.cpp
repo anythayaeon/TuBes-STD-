@@ -1,10 +1,4 @@
 
-/*
- * File: main.cpp
- * Description: Main program untuk Music Player dengan Role-Based Access System
- * Author: AI Generated
- * Date: December 7, 2025
- */
 
 #include "music.h"
 
@@ -288,3 +282,4 @@ int main() {
     
     return 0;
 }
+
