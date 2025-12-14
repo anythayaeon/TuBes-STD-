@@ -138,18 +138,29 @@ int main() {
     
     printf("[OK] Loaded %d songs into library\n\n", libCount);
     
-    // Queue & History
-    QueueNode* queueFront = NULL;
-    QueueNode* queueRear = NULL;
-    HistoryNode* historyTop = NULL;
+    // Queue & History (CLASSIC DATA STRUCTURE STYLE)
+    Queue playQueue;
+    playQueue.head = NULL;
+    playQueue.tail = NULL;
+    
+    History playHistory;
+    playHistory.top = NULL;
     
     // Current playing song
     Song* currentSong = NULL;
     int isPlaying = 0;
     
-    // Playlist
-    Playlist myPlaylist;
-    initPlaylist(&myPlaylist, "My Playlist");
+    // Multiple Playlists Support
+    Playlist playlists[20];  // Maximum 20 playlists
+    int playlistCount = 0;
+    int activePlaylistIndex = -1;  // -1 means no playlist selected
+    
+    // Context untuk playlist navigation
+    Playlist contextPlaylist;
+    contextPlaylist.head = NULL;
+    contextPlaylist.tail = NULL;
+    contextPlaylist.songCount = 0;
+    addressPlaylist currentPlaylistNode = NULL;
     
     // ----- MAIN LOOP -----
     bool running = true;
@@ -178,7 +189,10 @@ int main() {
                 printf("\nThank you for using Music Player!\n");
                 running = false;
                 loggedIn = false;
-            } else if (choice == 8) {
+            } else if (choice == 8 && role == ROLE_USER) {
+                printf("[LOGOUT] Logging out...\n");
+                loggedIn = false;
+            } else if (choice == 9 && role == ROLE_ADMIN) {
                 printf("[LOGOUT] Logging out...\n");
                 loggedIn = false;
             } else if (choice == 1) {
@@ -216,8 +230,8 @@ int main() {
                     pauseScreen(&dummy);
                 } else {
                     // User: Now Playing
-                    handleNowPlayingMenu(&currentSong, &isPlaying, &queueFront, 
-                                        &queueRear, &historyTop, library, libCount);
+                    handleNowPlayingMenu(&currentSong, &isPlaying, &playQueue, 
+                                        &playHistory, library, libCount, &contextPlaylist, &currentPlaylistNode);
                 }
             } else if (choice == 3) {
                 if (role == ROLE_ADMIN) {
@@ -229,9 +243,21 @@ int main() {
                     pauseScreen(&dummy);
                 } else {
                     // User: Queue System
-                    handleQueueMenu(&queueFront, &queueRear);
+                    handleQueueMenu(&playQueue);
                 }
             } else if (choice == 4) {
+                if (role == ROLE_ADMIN) {
+                    // Admin: Edit Song
+                    int id;
+                    printf("Enter song ID to edit: ");
+                    scanf("%d", &id);
+                    editSongInLibrary(library, libCount, id, role);
+                    pauseScreen(&dummy);
+                } else {
+                    // User: My Playlists
+                    handlePlaylistMenu(playlists, &playlistCount, &activePlaylistIndex, library, libCount, &currentSong, &isPlaying, &contextPlaylist, &currentPlaylistNode);
+                }
+            } else if (choice == 5) {
                 if (role == ROLE_ADMIN) {
                     // Admin: Sort Library
                     Song temp[100];
@@ -240,34 +266,29 @@ int main() {
                     printLibrary(library, libCount);
                     pauseScreen(&dummy);
                 } else {
-                    // User: My Playlists
-                    handlePlaylistMenu(&myPlaylist, library, libCount);
-                }
-            } else if (choice == 5) {
-                if (role == ROLE_ADMIN) {
-                    // Admin: Search Songs
-                    handleSearchMenu(library, libCount);
-                } else {
                     // User: Liked Songs
-                    handleLikedMenu(library, libCount);
+                    handleLikedMenu(library, libCount, &currentSong, &isPlaying);
                 }
             } else if (choice == 6) {
                 if (role == ROLE_ADMIN) {
-                    // Admin: Now Playing
-                    handleNowPlayingMenu(&currentSong, &isPlaying, &queueFront, 
-                                        &queueRear, &historyTop, library, libCount);
+                    // Admin: Search Songs
+                    handleSearchMenu(library, libCount);
                 } else {
                     // User: Search Songs
                     handleSearchMenu(library, libCount);
                 }
             } else if (choice == 7) {
                 if (role == ROLE_ADMIN) {
-                    // Admin: Queue System
-                    handleQueueMenu(&queueFront, &queueRear);
+                    // Admin: Now Playing
+                    handleNowPlayingMenu(&currentSong, &isPlaying, &playQueue, 
+                                        &playHistory, library, libCount, &contextPlaylist, &currentPlaylistNode);
                 } else {
                     // User: Recommendations
-                    handleRecommendationMenu(library, libCount, historyTop);
+                    handleRecommendationMenu(library, libCount, &playHistory, &currentSong, &isPlaying);
                 }
+            } else if (choice == 8 && role == ROLE_ADMIN) {
+                // Admin: Queue System
+                handleQueueMenu(&playQueue);
             } else {
                 printf("[ERROR] Invalid choice!\n");
                 pauseScreen(&dummy);
@@ -276,11 +297,15 @@ int main() {
     }
     
     // ----- CLEANUP -----
-    clearQueue(&queueFront, &queueRear, &dummy);
-    deletePlaylist(&myPlaylist, &dummy);
+    clearQueue(&playQueue, &dummy);
     
-    while (historyTop != NULL) {
-        Song* temp = popHistory(&historyTop);
+    // Delete all playlists
+    for (int i = 0; i < playlistCount; i++) {
+        deletePlaylist(&playlists[i], &dummy);
+    }
+    
+    while (playHistory.top != NULL) {
+        Song* temp = popHistory(&playHistory);
     }
     
     return 0;

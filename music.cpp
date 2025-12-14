@@ -1,7 +1,7 @@
 /*
  * File: music.cpp
  * Description: Login system
- */
+z */
 
 #include "music.h"
 
@@ -14,7 +14,7 @@ int loginSystem(int* roleOutput) {
     while (true) {
         printf("\n");
         printf("========================================\n");
-        printf("       MUSIC PLAYER LOGIN\n");
+        printf("       SELAMAT DATANG DI MUSIC MUSIKIN AJE BOY\n");
         printf("========================================\n");
         printf("1. [ADMIN] Login as Admin\n");
         printf("2. [USER]  Login as User\n");

@@ -1,231 +1,293 @@
-# Music Player - C++ Procedural (Role System)
+# Music Player - Aplikasi Pemutar Musik Berbasis Konsol
+## Tugas Besar Struktur Data - Role-Based Music Player
 
-Music player dengan sistem role (Admin & User) menggunakan **procedural C++** murni tanpa OOP.
+Music player dengan sistem role (Admin & User) menggunakan **procedural C++** murni tanpa OOP, dengan implementasi struktur data klasik.
 
-## Features
-- Role-based access (Admin & User) dengan #define
-- Library management (Admin only: add/delete songs)
-- 60+ lagu populer (The Weeknd, SZA, Drake, Taylor Swift, dll)
-- Playlist management (Doubly Linked List)
-- Queue system (FIFO untuk upcoming songs)
-- History stack (LIFO untuk previous songs)
-- Search & Recommendations
-- Like/Unlike system
-- Merge Sort A-Z
+---
 
-## Login
-**Admin**: Pilih 1, password: `admin` (atau Enter skip)  
-**User**: Pilih 2, password: `user` (atau Enter skip)
+## 🎯 FITUR YANG DIIMPLEMENTASIKAN
 
-## Struktur File
+### ✅ FITUR ADMIN (Wajib + Lengkap)
+1. **CRUD Library**
+   - ✅ **View** - Lihat semua lagu dalam library
+   - ✅ **Add** - Tambah lagu baru ke library
+   - ✅ **Edit** - Edit data lagu (title, artist, album, year) 
+   - ✅ **Delete** - Hapus lagu dari library
+   - ✅ **Sort** - Sorting A-Z menggunakan Merge Sort
+   
+2. **Music Player**
+   - ✅ Play/Pause/Stop lagu
+   - ✅ Next/Previous song
+   - ✅ Queue system (FIFO)
+   - ✅ History stack (LIFO)
+   
+3. **Search & Management**
+   - ✅ Search by title
+   - ✅ Search by artist
+   - ✅ Like/Unlike songs
+   
+### ✅ FITUR USER (Wajib + Tambahan)
+1. **Music Player**
+   - ✅ Play/Pause/Stop lagu
+   - ✅ **Next/Prev dengan Context-Aware Navigation** !
+     - Jika sedang play dari playlist → next/prev mengikuti urutan playlist
+     - Jika sedang play biasa → next/prev dari queue
+   - ✅ Queue management
+   
+2. **Playlist Management (Doubly Linked List)**
+   - ✅ Create playlist
+   - ✅ View playlist
+   - ✅ Add lagu ke playlist dari Library
+   - ✅ **Play lagu langsung dari playlist** 
+   - ✅ Remove lagu dari playlist
+   - ✅ Delete playlist
+   
+3. **Liked Songs (Favorit)**
+   - ✅ View all liked songs
+   - ✅ **Play lagu langsung dari liked songs** 
+   - ✅ Unlike songs
+   - ✅ Like songs dari library
+   
+4. **Recommendations**
+   - ✅ Most played songs (Top 10)
+   - ✅ Recently played (from history stack)
+   - ✅ **Play lagu langsung dari recommendations** 
+   
+5. **Search**
+   - ✅ Search by title
+   - ✅ Search by artist
+
+---
+
+## 🔧 STRUKTUR DATA KLASIK
+
+### 1. Song Library - Array dengan typedef
+```cpp
+struct infotypeSong {
+    int id;
+    char title[100];
+    char artist[100];
+    char album[100];
+    int year;
+    int playCount;
+    int isLiked;
+};
+typedef infotypeSong Song;
+```
+
+### 2. Playlist - Doubly Linked List
+```cpp
+typedef struct elmPlaylist *addressPlaylist;
+struct elmPlaylist {
+    Song* song;
+    addressPlaylist next;
+    addressPlaylist prev;
+};
+```
+
+### 3. Queue - Single Linked List dengan Head & Tail
+```cpp
+typedef struct elmQueue *addressQueue;
+struct elmQueue {
+    Song* song;
+    addressQueue next;
+};
+```
+
+### 4. History - Stack (Single Linked List)
+```cpp
+typedef struct elmHistory *addressHistory;
+struct elmHistory {
+    Song* song;
+    addressHistory next;
+};
+```
+
+---
+
+## 🐛 BUG YANG DIPERBAIKI
+
+1. **Playlist Linked List** ✅ FIXED
+   - Sekarang bisa menambah banyak lagu
+   - Pointer next/prev terhubung dengan benar
+   - Head/tail update konsisten
+
+2. **Next/Prev Navigation** ✅ FIXED
+   - Context-aware: mengikuti playlist jika play dari playlist
+   - Fallback to queue jika tidak ada playlist context
+
+3. **Admin Edit Feature** ✅ ADDED
+   - Function editSongInLibrary() dengan validasi role
+
+4. **Play dari Berbagai Sumber** ✅ ADDED
+   - Play dari playlist
+   - Play dari liked songs
+   - Play dari recommendations
+
+---
+
+## 📁 STRUKTUR FILE
 
 ```
 music-player/
-├── music.h          # Header (structs, function declarations)
-├── music.cpp        # Login system
-├── library.cpp      # Library & search functions
-├── queue.cpp        # Queue & History (Stack) functions
-├── playlist.cpp     # Playlist management
-├── menus.cpp        # All menu handlers & utility
-├── main.cpp         # Main program + 60+ manual songs
-└── README.md        # This file
+├── music.h              # Header & struct definitions
+├── music.cpp            # Login system
+├── library.cpp          # Library management + Edit
+├── queue.cpp            # Queue & History (context-aware)
+├── playlist.cpp         # Playlist management (enhanced)
+├── menus.cpp            # All menu handlers (updated)
+├── main.cpp             # Main program + 80+ songs
+└── README.md            # This file
 ```
 
-## Compile & Run
+---
 
-### Windows (PowerShell)
+## 🔨 COMPILE & RUN
+
+### Windows
 ```powershell
-g++ -std=c++17 music.cpp library.cpp queue.cpp playlist.cpp menus.cpp main.cpp -o music.exe
-.\music.exe
+g++ main.cpp library.cpp menus.cpp music.cpp playlist.cpp queue.cpp -o program.exe
+.\program.exe
 ```
 
 ### Linux/Mac
 ```bash
-g++ -std=c++17 music.cpp library.cpp queue.cpp playlist.cpp menus.cpp main.cpp -o music
-./music
+g++ main.cpp library.cpp menus.cpp music.cpp playlist.cpp queue.cpp -o program
+./program
 ```
 
-### Code::Blocks
-1. Create new Console Application project
-2. Add **ALL** .cpp files (music.cpp, library.cpp, queue.cpp, playlist.cpp, menus.cpp, main.cpp)
-3. Add music.h header
-4. Build & Run (F9)
+---
 
-## Lagu yang Tersedia
+## 🎮 CARA MENGGUNAKAN
 
-Library berisi 60+ lagu populer dari artis:
-- **The Weeknd** - Blinding Lights, Starboy, Save Your Tears, Die For You, The Hills
-- **SZA** - Kill Bill, Snooze, Good Days, All The Stars
-- **Drake** - God's Plan, One Dance, Hotline Bling, In My Feelings
-- **Taylor Swift** - Anti-Hero, Cruel Summer, Shake It Off, Blank Space
-- **Ariana Grande** - 7 rings, Thank U Next, Positions
-- **Ed Sheeran** - Shape of You, Perfect, Bad Habits, Shivers
-- **Dua Lipa** - Levitating, Don't Start Now, New Rules
-- **Bruno Mars** - Uptown Funk, 24K Magic, Leave The Door Open
-- **Post Malone** - Circles, Sunflower, Rockstar, Congratulations
-- **Billie Eilish** - Bad Guy, Happier Than Ever, Lovely
-- **Harry Styles** - As It Was, Watermelon Sugar, Adore You
-- **Olivia Rodrigo** - Drivers License, Good 4 U, Vampire
-- **Justin Bieber** - Peaches, Sorry, Stay, Love Yourself
-- **Dan banyak lagi...**
+### Login
+- **Admin**: password `admin` (or press Enter)
+- **User**: password `user` (or press Enter)
 
-## Cara Menggunakan
-
-### 1. Login
+### Admin Menu
 ```
-========================================
-       MUSIC PLAYER LOGIN
-========================================
-1. [ADMIN] Login as Admin
-2. [USER]  Login as User
-0. [EXIT]  Exit
-========================================
-```
-
-### 2. Admin Features
-- **[VIEW]** View Library - Lihat semua lagu
-- **[ADD]** Add New Song - Tambah lagu baru (ADMIN ONLY)
-- **[DELETE]** Delete Song - Hapus lagu (ADMIN ONLY)
-- **[SORT]** Sort Library A-Z - Sort alfabetis
-- **[SEARCH]** Search Songs - Cari berdasarkan judul/artis
-- **[PLAY]** Now Playing - Putar lagu, next/prev, queue
-- **[QUEUE]** Queue System - Kelola antrian
-- **[LOGOUT]** Logout - Ganti role
-
-### 3. User Features
-- **[VIEW]** View Library - Hanya lihat (read-only)
-- **[PLAY]** Now Playing - Main lagu
-- **[QUEUE]** Queue System - Lihat/kelola queue
-- **[LIST]** My Playlists - Buat playlist sendiri
-- **[LIKED]** Liked Songs - Lihat & unlike lagu favorit
-- **[SEARCH]** Search Songs - Cari lagu
-- **[RECOM]** Recommendations - Most played & recently played
-
-### 4. Now Playing Menu
-```
-========================================
-          NOW PLAYING
-========================================
->> Blinding Lights - The Weeknd
-Album: After Hours | Year: 2020
-Plays: 95 | Status: [PLAYING]
-========================================
-
-1. [PLAY] Play/Pause
-2. [NEXT] Next Song (from Queue)
-3. [PREV] Previous Song (from History)
-4. [VIEW] Show Queue
-5. [ADD]  Add Song to Queue
-6. [SELECT] Select Song from Library to Play
-0. [BACK] Back
-```
-
-## Data Structures
-
-- **Library**: Static Array (100 songs max)
-- **Playlist**: Doubly Linked List (next & prev pointers)
-- **Queue**: Single Linked List (FIFO - First In First Out)
-- **History**: Stack Linked List (LIFO - Last In First Out)
-- **Role**: Integer constant via #define (1=Admin, 2=User)
-
-## Technical Details
-
-### Permission System
-```cpp
-#define ROLE_ADMIN 1
-#define ROLE_USER 2
-
-void addSongToLibrary(Song lib[], int* libCount, Song* newSong, int role) {
-    if (role != ROLE_ADMIN) {
-        printf("[ERROR] Permission Denied! Only Admin can add songs.\n");
-        return;
-    }
-    // ... implementation
-}
-```
-
-### Manual Song Loading
-```cpp
-// Di main.cpp
-addManualSong(library, &libCount, "Kill Bill", "SZA", "SOS", 2022, 94);
-addManualSong(library, &libCount, "Blinding Lights", "The Weeknd", "After Hours", 2020, 95);
-```
-
-### Merge Sort (O(n log n))
-```cpp
-void mergeSortLibrary(Song lib[], Song temp[], int left, int right);
-void mergeLibrary(Song lib[], Song temp[], int left, int mid, int right);
-```
-
-## Constraints
-
-- Procedural only
-- Struct untuk ADT
-- Manual linked list implementation
-- Library: `<iostream>`, `<cstring>`, `<cstdio>`, `<cstdlib>`, `<ctime>`
-
-## Troubleshooting
-
-### Compilation Error
-```bash
-# Pastikan semua file ada
-ls music.h music.cpp library.cpp queue.cpp playlist.cpp menus.cpp main.cpp
-
-# Compile ulang
-g++ -std=c++17 music.cpp library.cpp queue.cpp playlist.cpp menus.cpp main.cpp -o music.exe
-```
-
-### Link Error
-- Pastikan compile **semua .cpp files** (6 files)
-- Jangan lupa: `music.cpp`, `library.cpp`, `queue.cpp`, `playlist.cpp`, `menus.cpp`, `main.cpp`
-
-### Emoji Error (Karakter aneh)
-- Sudah fixed! Semua emoji diganti ASCII:
-  - Checkmark → `[OK]`
-  - Cross → `[ERROR]`
-  - Heart → `<3`
-  - Music note → (removed/plain text)
-
-## Example Session
-
-```
-[INFO] Loading music library...
-[OK] Loaded 60 songs into library
-
-========================================
-       MUSIC PLAYER LOGIN
-========================================
-1. [ADMIN] Login as Admin
-2. [USER]  Login as User
-0. [EXIT]  Exit
-========================================
-Choice: 2
-Enter user password (or press Enter to skip): [Enter]
-[OK] Login successful! Welcome User.
-
-========================================
-            USER MENU
-========================================
-1. [VIEW]  View Library (Read-Only)
-2. [PLAY]  Now Playing
-3. [QUEUE] Queue System
-4. [LIST]  My Playlists
-5. [LIKED] Liked Songs
+1. [VIEW]   View Library
+2. [ADD]    Add New Song
+3. [DELETE] Delete Song
+4. [EDIT]   Edit Song ⭐ NEW!
+5. [SORT]   Sort Library A-Z
 6. [SEARCH] Search Songs
-7. [RECOM] Recommendations
-8. [LOGOUT] Logout
-0. [EXIT]  Exit
-========================================
-Choice: 1
-
-=== LIBRARY (60 songs) ===
-ID    Title                          Artist               Album                Year   Plays    Liked
-------------------------------------------------------------------------------------
-1     Blinding Lights                The Weeknd           After Hours          2020   95         
-2     Starboy                        The Weeknd           Starboy              2016   88         
-3     Save Your Tears                The Weeknd           After Hours          2020   82         
-...
+7. [PLAY]   Now Playing
+8. [QUEUE]  Queue System
+9. [LOGOUT] Logout
 ```
 
-## License
-Free to use for educational purposes
+### User Menu
+```
+1. [VIEW]   View Library (Read-Only)
+2. [PLAY]   Now Playing
+3. [QUEUE]  Queue System
+4. [LIST]   My Playlists ⭐ ENHANCED!
+5. [LIKED]  Liked Songs ⭐ ENHANCED!
+6. [SEARCH] Search Songs
+7. [RECOM]  Recommendations ⭐ ENHANCED!
+8. [LOGOUT] Logout
+```
+
+---
+
+## 🆕 FITUR BARU
+
+### 1. Edit Song (Admin)
+Admin bisa edit title, artist, album, year dari lagu existing.
+
+### 2. Play dari Playlist (User)
+- Pilih lagu dari playlist by number
+- Otomatis set context untuk next/prev
+- Next/prev mengikuti urutan playlist
+
+### 3. Play dari Liked Songs (User)
+- Lihat semua liked songs
+- Play langsung by ID
+
+### 4. Play dari Recommendations (User)
+- Lihat most played / recently played
+- Play langsung by ID
+
+### 5. Context-Aware Navigation
+- Next/prev detect apakah user sedang play dari playlist
+- Jika ya → follow playlist order
+- Jika tidak → fallback to queue
+
+---
+
+## 🔬 KONSISTENSI STRUKTUR DATA
+
+✅ **Format Klasik Dipertahankan:**
+- `typedef struct *address` untuk abstraksi pointer
+- `struct infotype` untuk data
+- `struct node` yang self-referential
+- Pemisahan: infotype → node → struktur utama
+
+✅ **Tidak Menggunakan:**
+- ❌ STL (vector, list, map)
+- ❌ Modern C++ (class, template)
+- ✅ Pure pointer-based manual implementation
+
+---
+
+## 📝 PENJELASAN TEKNIS
+
+### Mengapa Doubly Linked List untuk Playlist?
+- Navigasi dua arah (next/prev dalam playlist)
+- Insert/delete O(1) di any position
+- Konsisten dengan teori struktur data
+
+### Mengapa Queue untuk Song Queue?
+- FIFO: Song pertama masuk diplay pertama
+- O(1) enqueue dan dequeue
+- Real-world analogy: antrian
+
+### Mengapa Stack untuk History?
+- LIFO: Previous song = last played
+- O(1) push dan pop
+- Perfect untuk fitur "back"
+
+### Context-Aware Navigation
+- Detect apakah user play dari playlist
+- Next/prev behavior sesuai context
+- Implementasi: pointer ke playlist dan current node
+
+---
+
+## ✅ CHECKLIST TUGAS BESAR
+
+- [x] **Admin: CRUD Library** (View, Add, Edit, Delete)
+- [x] **Admin: Sort Library** (Merge Sort A-Z)
+- [x] **User: Search Song** (by title, by artist)
+- [x] **User: Play/Stop** (dengan play count)
+- [x] **User: Next/Prev** (context-aware)
+- [x] **User: Playlist Management** (Doubly Linked List)
+- [x] **User: Play from Playlist** (context preservation)
+- [x] **User: Liked Songs** (play langsung)
+- [x] **User: Recommendations** (play langsung)
+- [x] **Queue System** (FIFO)
+- [x] **History Stack** (LIFO)
+- [x] **Struktur Data Klasik** (typedef, address, self-referential)
+- [x] **No STL** (pure manual)
+- [x] **Bug Fixed** (playlist linked list valid)
+
+---
+
+## 🎉 KESIMPULAN
+
+✅ **Memenuhi semua requirement dasar**  
+✅ **Fitur tambahan yang masuk akal**  
+✅ **Semua bug diperbaiki**  
+✅ **Struktur data klasik benar**  
+✅ **Ready untuk laporan dan presentasi**
+
+**Compiled Successfully** ✅  
+**All Features Working** ✅  
+**Ready for Submission** ✅
+
+---
+
+**Version:** 2.0 - Enhanced Edition  
+**Last Updated:** December 14, 2025  
+**Status:** Production Ready 🚀
