@@ -39,76 +39,93 @@ void playSong(Song* current, int* isPlaying) {
     }
 }
 
-void enqueueSong(QueueNode** front, QueueNode** rear, Song* s) {
-    QueueNode* newNode = new QueueNode;
+void enqueueSong(Queue* q, Song* s) {
+    addressQueue newNode = new elmQueue;
     newNode->song = s;
     newNode->next = NULL;
     
-    if (*rear == NULL) {
-        *front = newNode;
-        *rear = newNode;
+    if (q->tail == NULL) {
+        q->head = newNode;
+        q->tail = newNode;
     } else {
-        (*rear)->next = newNode;
-        *rear = newNode;
+        q->tail->next = newNode;
+        q->tail = newNode;
     }
 }
 
-void dequeueSong(QueueNode** front, QueueNode** rear, Song** output) {
-    if (*front == NULL) {
+void dequeueSong(Queue* q, Song** output) {
+    if (q->head == NULL) {
         *output = NULL;
         return;
     }
     
-    QueueNode* temp = *front;
+    addressQueue temp = q->head;
     *output = temp->song;
-    *front = (*front)->next;
+    q->head = q->head->next;
     
-    if (*front == NULL) {
-        *rear = NULL;
+    if (q->head == NULL) {
+        q->tail = NULL;
     }
     
     delete temp;
 }
 
-void pushHistory(HistoryNode** histTop, Song* s) {
-    HistoryNode* newNode = new HistoryNode;
+void pushHistory(History* hist, Song* s) {
+    addressHistory newNode = new elmHistory;
     newNode->song = s;
-    newNode->next = *histTop;
-    *histTop = newNode;
+    newNode->next = hist->top;
+    hist->top = newNode;
 }
 
-Song* popHistory(HistoryNode** histTop) {
-    if (*histTop == NULL) {
+Song* popHistory(History* hist) {
+    if (hist->top == NULL) {
         return NULL;
     }
     
-    HistoryNode* temp = *histTop;
+    addressHistory temp = hist->top;
     Song* s = temp->song;
-    *histTop = (*histTop)->next;
+    hist->top = hist->top->next;
     delete temp;
     
     return s;
 }
 
-void nextSong(QueueNode** front, QueueNode** rear, Song** current, HistoryNode** histTop) {
+void nextSong(Queue* q, Song** current, History* hist, Playlist* contextPlaylist, addressPlaylist* currentNode) {
+    // Save current to history
     if (*current != NULL) {
-        pushHistory(histTop, *current);
+        pushHistory(hist, *current);
     }
     
+    // Check if we're in playlist context
+    if (contextPlaylist != NULL && contextPlaylist->head != NULL && *currentNode != NULL) {
+        // Next in playlist
+        if ((*currentNode)->next != NULL) {
+            *currentNode = (*currentNode)->next;
+            *current = (*currentNode)->song;
+            (*current)->playCount++;
+            printf("[NEXT] Next in playlist: %s\n", (*current)->title);
+            return;
+        } else {
+            printf("[INFO] End of playlist reached.\n");
+            // Fallback to queue
+        }
+    }
+    
+    // Try queue
     Song* nextSongPtr = NULL;
-    dequeueSong(front, rear, &nextSongPtr);
+    dequeueSong(q, &nextSongPtr);
     
     if (nextSongPtr != NULL) {
         *current = nextSongPtr;
         (*current)->playCount++;
-        printf("[NEXT] Next: %s\n", (*current)->title);
+        printf("[NEXT] Next from queue: %s\n", (*current)->title);
     } else {
-        printf("[ERROR] Queue is empty!\n");
+        printf("[ERROR] No next song available!\n");
     }
 }
 
-void previousSong(HistoryNode** histTop, Song** current) {
-    Song* prevSongPtr = popHistory(histTop);
+void previousSong(History* hist, Song** current) {
+    Song* prevSongPtr = popHistory(hist);
     
     if (prevSongPtr != NULL) {
         *current = prevSongPtr;
@@ -118,15 +135,15 @@ void previousSong(HistoryNode** histTop, Song** current) {
     }
 }
 
-void printQueue(QueueNode* front, int* dummy) {
-    if (front == NULL) {
+void printQueue(Queue* q, int* dummy) {
+    if (q->head == NULL) {
         printf("[INFO] Queue is empty!\n");
         return;
     }
     
     printf("\n=== QUEUE ===\n");
     int pos = 1;
-    QueueNode* temp = front;
+    addressQueue temp = q->head;
     
     while (temp != NULL) {
         printf("%d. %s - %s\n", pos, temp->song->title, temp->song->artist);
@@ -136,12 +153,12 @@ void printQueue(QueueNode* front, int* dummy) {
     printf("\n");
 }
 
-void clearQueue(QueueNode** front, QueueNode** rear, int* dummy) {
-    while (*front != NULL) {
-        QueueNode* temp = *front;
-        *front = (*front)->next;
+void clearQueue(Queue* q, int* dummy) {
+    while (q->head != NULL) {
+        addressQueue temp = q->head;
+        q->head = q->head->next;
         delete temp;
     }
-    *rear = NULL;
+    q->tail = NULL;
     printf("[OK] Queue cleared!\n");
 }

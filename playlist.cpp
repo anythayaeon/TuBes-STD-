@@ -15,7 +15,7 @@ void initPlaylist(Playlist* pl, const char name[]) {
 }
 
 void addSongToPlaylist(Playlist* pl, Song* s) {
-    PlaylistNode* newNode = new PlaylistNode;
+    addressPlaylist newNode = new elmPlaylist;
     newNode->song = s;
     newNode->next = NULL;
     newNode->prev = NULL;
@@ -34,7 +34,7 @@ void addSongToPlaylist(Playlist* pl, Song* s) {
 }
 
 void removeSongFromPlaylist(Playlist* pl, int songId) {
-    PlaylistNode* current = pl->head;
+    addressPlaylist current = pl->head;
     
     while (current != NULL && current->song->id != songId) {
         current = current->next;
@@ -70,7 +70,7 @@ void printPlaylist(Playlist* pl, int* dummy) {
     
     printf("\n=== PLAYLIST: %s (%d songs) ===\n", pl->name, pl->songCount);
     int pos = 1;
-    PlaylistNode* current = pl->head;
+    addressPlaylist current = pl->head;
     
     while (current != NULL) {
         printf("%d. [ID:%d] %s - %s\n", pos, current->song->id, 
@@ -81,11 +81,62 @@ void printPlaylist(Playlist* pl, int* dummy) {
     printf("\n");
 }
 
-void deletePlaylist(Playlist* pl, int* dummy) {
-    PlaylistNode* current = pl->head;
+void printPlaylistWithNumbers(Playlist* pl) {
+    if (pl->head == NULL) {
+        printf("[INFO] Playlist '%s' is empty!\n", pl->name);
+        return;
+    }
+    
+    printf("\n=== PLAYLIST: %s (%d songs) ===\n", pl->name, pl->songCount);
+    printf("%-4s %-5s %-30s %-20s\n", "No", "ID", "Title", "Artist");
+    printf("------------------------------------------------------------------------------------\n");
+    
+    int pos = 1;
+    addressPlaylist current = pl->head;
     
     while (current != NULL) {
-        PlaylistNode* temp = current;
+        printf("%-4d %-5d %-30s %-20s\n", pos, current->song->id, 
+               current->song->title, current->song->artist);
+        current = current->next;
+        pos++;
+    }
+    printf("\n");
+}
+
+Song* getPlaylistSongByIndex(Playlist* pl, int index) {
+    if (index < 1 || index > pl->songCount) {
+        return NULL;
+    }
+    
+    addressPlaylist current = pl->head;
+    int pos = 1;
+    
+    while (current != NULL && pos < index) {
+        current = current->next;
+        pos++;
+    }
+    
+    return (current != NULL) ? current->song : NULL;
+}
+
+addressPlaylist findPlaylistNodeBySong(Playlist* pl, Song* s) {
+    addressPlaylist current = pl->head;
+    
+    while (current != NULL) {
+        if (current->song == s) {
+            return current;
+        }
+        current = current->next;
+    }
+    
+    return NULL;
+}
+
+void deletePlaylist(Playlist* pl, int* dummy) {
+    addressPlaylist current = pl->head;
+    
+    while (current != NULL) {
+        addressPlaylist temp = current;
         current = current->next;
         delete temp;
     }

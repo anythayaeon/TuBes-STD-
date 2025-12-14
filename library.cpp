@@ -47,6 +47,55 @@ void addSongToLibrary(Song lib[], int* libCount, Song* newSong, int role) {
     printf("[OK] Song added successfully! Total songs: %d\n", *libCount);
 }
 
+void editSongInLibrary(Song lib[], int libCount, int id, int role) {
+    if (role != ROLE_ADMIN) {
+        printf("[ERROR] Permission Denied! Only Admin can edit songs.\n");
+        return;
+    }
+    
+    Song* song = findSongById(lib, libCount, id);
+    if (song == NULL) {
+        printf("[ERROR] Song with ID %d not found!\n", id);
+        return;
+    }
+    
+    printf("\n=== EDIT SONG (ID: %d) ===\n", id);
+    printf("Current: %s - %s (%s, %d)\n", song->title, song->artist, song->album, song->year);
+    printf("\nEnter new details (press Enter to keep current value):\n");
+    
+    char buffer[100];
+    getchar(); // consume newline
+    
+    printf("Title [%s]: ", song->title);
+    fgets(buffer, 100, stdin);
+    if (buffer[0] != '\n') {
+        buffer[strcspn(buffer, "\n")] = 0;
+        strcpy(song->title, buffer);
+    }
+    
+    printf("Artist [%s]: ", song->artist);
+    fgets(buffer, 100, stdin);
+    if (buffer[0] != '\n') {
+        buffer[strcspn(buffer, "\n")] = 0;
+        strcpy(song->artist, buffer);
+    }
+    
+    printf("Album [%s]: ", song->album);
+    fgets(buffer, 100, stdin);
+    if (buffer[0] != '\n') {
+        buffer[strcspn(buffer, "\n")] = 0;
+        strcpy(song->album, buffer);
+    }
+    
+    printf("Year [%d]: ", song->year);
+    fgets(buffer, 100, stdin);
+    if (buffer[0] != '\n') {
+        song->year = atoi(buffer);
+    }
+    
+    printf("[OK] Song updated successfully!\n");
+}
+
 void deleteSongFromLibrary(Song lib[], int* libCount, int id, int role) {
     if (role != ROLE_ADMIN) {
         printf("[ERROR] Permission Denied! Only Admin can delete songs.\n");
@@ -239,16 +288,16 @@ void showMostPlayed(Song lib[], int libCount, int topN) {
     printf("\n");
 }
 
-void showRecentlyPlayed(HistoryNode* histTop, int topN) {
+void showRecentlyPlayed(History* hist, int topN) {
     printf("\n=== RECENTLY PLAYED ===\n");
     
-    if (histTop == NULL) {
+    if (hist->top == NULL) {
         printf("No history yet.\n\n");
         return;
     }
     
     int count = 0;
-    HistoryNode* current = histTop;
+    addressHistory current = hist->top;
     
     while (current != NULL && count < topN) {
         printf("%d. %s - %s\n", count + 1, current->song->title, current->song->artist);
