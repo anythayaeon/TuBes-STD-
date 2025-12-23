@@ -1,5 +1,9 @@
 # Music Player - Aplikasi Pemutar Musik Berbasis Konsol
 ## Tugas Besar Struktur Data - Role-Based Music Player
+## Anggota kelompok =
+1. Yaser Nur Taxiano - 103052430008
+2. Anindya Athaya Priyanti - 103052400059
+3. Ghazy Abdad Nur Taxiano - 103052430006
 
 ## 🎯 FITUR YANG DIIMPLEMENTASIKAN
 
@@ -271,4 +275,5 @@ Admin bisa edit title, artist, album, year dari lagu existing.
 **Version:** 2.0 - Enhanced Edition  
 **Last Updated:** December 14, 2025  
 **Status:** Production Ready 🚀
+
 
